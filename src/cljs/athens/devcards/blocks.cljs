@@ -76,9 +76,9 @@
 (def block-style
   {:display "flex"
    :line-height "32px"
-  ;;  :position "relative"
    :justify-content "flex-start"
-   :flex-direction "column"})
+   :flex-direction "column"
+   })
 
 
 (def block-disclosure-toggle-style
@@ -133,10 +133,10 @@
                                                                   :opacity (:opacity-med OPACITIES)}]]
                      [:&.closed [(selectors/& (selectors/before)) {:content "none"}]]
                      [:&.closed [(selectors/& (selectors/before)) {:content "none"}]]
+                     [:&:hover:after {:transform "translate(-50%, -50%) scale(1.3)"}]
                      [:&.dragging {:z-index "1000"
                                    :cursor "grabbing"
                                    :color (color :body-text-color)}]
-                     [:&.dragging [(selectors/& (selectors/after)) {:box-shadow "0 4px 16px 1px"}]]
                      [:&.selected {}]]})
 
 
@@ -180,13 +180,15 @@
                                  :resize "none"
                                  :color "inherit"
                                  :padding "0"
+                                 :caret-color (color :link-color)
                                  :margin "0"
                                  :font-size "inherit"
                                  :line-height "inherit"
+                                 :overflow "hidden"
+                                 :margin-bottom "-10px" ;; FIXME: hack to correct for improper textarea autosizing. 
                                  :border "0"
                                  :font-family "inherit"}]
                      [:textarea:focus {:outline "none"
-                                       :margin-bottom "-10px" ;; FIXME: hack to correct for improper textarea autosizing. 
                                        :opacity (:opacity-high OPACITIES)}]]})
 
 

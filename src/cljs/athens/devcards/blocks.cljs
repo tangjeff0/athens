@@ -176,20 +176,33 @@
 
 (def block-content-style
   {:cursor "text"
-   ::stylefy/manual [[:textarea {:-webkit-appearance "none"
+   :position "relative"
+   :overflow "visible"
+   ::stylefy/manual [[:textarea {:display "none"}]
+                     [:&:hover [:textarea {:display "block"}]]
+                     [:textarea {:-webkit-appearance "none"
                                  :resize "none"
                                  :color "inherit"
                                  :padding "0"
+                                 :position "absolute"
+                                 :background (color :app-bg-color)
+                                 :top "0"
+                                 :left "0"
+                                 :right "0"
+                                 :height "100%"
                                  :margin "0"
-                                 :overflow "hidden"
+                                 :overflow "visible"
                                  :font-size "inherit"
                                  :caret-color (color :link-color)
                                  :line-height "inherit"
+                                 :margin-bottom "-10px" 
+                                 :transition "all 0.15s ease"
                                  :border "0"
+                                 :opacity "0"
                                  :font-family "inherit"}]
                      [:textarea:focus {:outline "none"
-                                       :margin-bottom "-10px" 
-                                       :opacity (:opacity-high OPACITIES)}]]}
+                                       :display "block"
+                                       :opacity "1"}]]}
   )
 
 
@@ -280,15 +293,14 @@ no results for pull eid returns nil
                                                      :user-select (when dragging-uid "none")})
                          {:class "block-contents"
                           :data-uid uid})
-         (if (= editing-uid uid)
-           [autosize/textarea {:value       string
+           [:textarea {:value       string
                                :style       {:width "100%"}
                                :auto-focus  true
                                :on-change   (fn [e]
                                               ;;(prn (.. e -target -value))
                                               (transact! db/dsdb [[:db/add dbid :block/string (.. e -target -value)]]))
                                :on-key-down (fn [e] (on-key-down e dbid order))}]
-           [parse-and-render string])
+           [parse-and-render string]
 
          (when (and (= closest-uid uid)
                     (= closest-kind :child))

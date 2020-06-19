@@ -76,7 +76,6 @@
 (def block-style
   {:display "flex"
    :line-height "32px"
-  ;;  :position "relative"
    :justify-content "flex-start"
    :flex-direction "column"})
 
@@ -176,18 +175,22 @@
 
 
 (def block-content-style
-  {::stylefy/manual [[:textarea {:-webkit-appearance "none"
+  {:cursor "text"
+   ::stylefy/manual [[:textarea {:-webkit-appearance "none"
                                  :resize "none"
                                  :color "inherit"
                                  :padding "0"
                                  :margin "0"
+                                 :overflow "hidden"
                                  :font-size "inherit"
+                                 :caret-color (color :link-color)
                                  :line-height "inherit"
                                  :border "0"
                                  :font-family "inherit"}]
                      [:textarea:focus {:outline "none"
-                                       :margin-bottom "-10px" ;; FIXME: hack to correct for improper textarea autosizing. 
-                                       :opacity (:opacity-high OPACITIES)}]]})
+                                       :margin-bottom "-10px" 
+                                       :opacity (:opacity-high OPACITIES)}]]}
+  )
 
 
 (def tooltip-style
@@ -236,6 +239,7 @@ no results for pull eid returns nil
       [:div (merge (use-style block-style
                               {:class "block-container"
                                :data-uid uid}))
+       
        [:div {:style {:display "flex"}}
 
         ;; Toggle

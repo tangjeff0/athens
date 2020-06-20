@@ -77,8 +77,7 @@
   {:display "flex"
    :line-height "32px"
    :justify-content "flex-start"
-   :flex-direction "column"
-   })
+   :flex-direction "column"})
 
 
 (def block-disclosure-toggle-style
@@ -251,7 +250,7 @@ no results for pull eid returns nil
       [:div (merge (use-style block-style
                               {:class "block-container"
                                :data-uid uid}))
-       
+
        [:div {:style {:display "flex"}}
 
         ;; Toggle
@@ -263,8 +262,8 @@ no results for pull eid returns nil
         ;; Bullet
         (if (= dragging-uid uid)
           [:span (merge (use-style block-indicator-style
-                          {:class    (clojure.string/join " " ["bullet" "dragging" (if closed? "closed" "open")])
-                           :data-uid uid})
+                                   {:class    (clojure.string/join " " ["bullet" "dragging" (if closed? "closed" "open")])
+                                    :data-uid uid})
                         {:style {:transform (str "translate(" x "px, " y "px)")}})]
 
           [:span (use-style block-indicator-style
@@ -274,7 +273,7 @@ no results for pull eid returns nil
 
         ;; Tooltip
         (when (and (= tooltip-uid uid)
-                (not dragging-uid))
+                   (not dragging-uid))
           [:div (use-style tooltip-style {:class "tooltip"})
            [:span [:b "dbid: "] dbid]
            [:span [:b "uid: "] uid]
@@ -294,15 +293,15 @@ no results for pull eid returns nil
                                                      :user-select (when dragging-uid "none")})
                          {:class "block-contents"
                           :data-uid uid})
-           [:textarea {:value       string
-                               :style       {:width "100%"}
-                               :auto-focus  true
-                               :on-change   (fn [e]
-                                              (prn (.. e -target -value))
+         [:textarea {:value       string
+                     :style       {:width "100%"}
+                     :auto-focus  true
+                     :on-change   (fn [e]
+                                    (prn (.. e -target -value))
                                               ;;(transact! db/dsdb [[:db/add dbid :block/string (.. e -target -value)]])
-                                              )
-                               :on-key-down (fn [e] (on-key-down e dbid order))}]
-           [parse-and-render string]
+                                    )
+                     :on-key-down (fn [e] (on-key-down e dbid order))}]
+         [parse-and-render string]
 
          ;; Drop Indicator
          (when (and (= closest-uid uid)

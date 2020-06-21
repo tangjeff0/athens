@@ -36,10 +36,12 @@ jobs:
           key: ${{ runner.os }}-maven-${{ hashFiles('project.clj') }}
           restore-keys: |
                 ${{ runner.os }}-maven-
+
       - name: Fetch deps
         if: steps.cache-deps.outputs.cache-hit != 'true'
         run: |
           lein deps
+
       - name: Run tests
         run: |
           script/test/jvm
@@ -61,7 +63,7 @@ jobs:
       - name: Lint
         run: |
           script/lint
-          
+
   style:
     # ubuntu 18.04 comes with lein + java8 installed
     runs-on: ubuntu-18.04
@@ -71,11 +73,11 @@ jobs:
         with:
           fetch-depth: 1
           submodules: 'true'
-          
+
       - name: Style 
         run: |
           script/style
-                 
+
   carve:
     # ubuntu 18.04 comes with lein + java8 installed
     runs-on: ubuntu-18.04
@@ -89,7 +91,7 @@ jobs:
       - uses: DeLaGuardo/setup-clojure@2.0
         with:
           tools-deps: '1.10.1.469'
-                             
+
       - name: Cache deps
         uses: actions/cache@v1
         id: cache-deps
@@ -97,7 +99,7 @@ jobs:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('deps.edn') }}
           restore-keys: |
-                ${{ runner.os }}-maven-    
+            ${{ runner.os }}-maven-    
 
       - name: Fetch deps
         if: steps.cache-deps.outputs.cache-hit != 'true'
@@ -107,7 +109,7 @@ jobs:
       - name: Carving unused vars 
         run: |
           script/carve
-          
+
 
   build-app:
     needs: [test]
@@ -127,11 +129,16 @@ jobs:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('project.clj') }}
           restore-keys: |
-                ${{ runner.os }}-maven-
+            ${{ runner.os }}-maven-
+
       - name: Fetch deps
         if: steps.cache-deps.outputs.cache-hit != 'true'
         run: |
           lein deps
+
+      - name: Deploy
+        run: |
+          script/deploy
 
       - name: Athens version
         id: athens-version

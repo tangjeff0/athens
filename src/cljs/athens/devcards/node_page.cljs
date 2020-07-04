@@ -149,30 +149,30 @@
 
    ;; References
    (doall
-    (for [[linked-or-unlinked refs] ref-groups]
-      [:div {:key linked-or-unlinked}
-       [:div (use-style {:display         "flex"
-                         :justify-content "space-between"
-                         :align-items "center"})
-        [:h3 linked-or-unlinked]
-        [:span
-         [button {:label    [(r/adapt-react-class mui-icons/FilterList)]
-                  :disabled true}]]]
-       (for [[group-title group] refs]
-         [:<> {:key group-title}
-          [:h4 group-title]
-          (for [{:block/keys [uid parents] :as block} group]
-            [:div {:key uid}
+     (for [[linked-or-unlinked refs] ref-groups]
+       [:div {:key linked-or-unlinked}
+        [:div (use-style {:display         "flex"
+                          :justify-content "space-between"
+                          :align-items "center"})
+         [:h3 linked-or-unlinked]
+         [:span
+          [button {:label    [(r/adapt-react-class mui-icons/FilterList)]
+                   :disabled true}]]]
+        (for [[group-title group] refs]
+          [:<> {:key group-title}
+           [:h4 group-title]
+           (for [{:block/keys [uid parents] :as block} group]
+             [:div {:key uid}
               ;; TODO: replace with breadcrumbs?
               ;; TODO: expand parent on click
-             (->> (for [{:keys [node/title block/string block/uid]} parents]
-                    [:span (use-style {:color "gray"} {:key uid}) (or title string)])
-                  (interpose ">")
-                  (map (fn [x]
-                         (if (= x ">")
-                           [(r/adapt-react-class mui-icons/KeyboardArrowRight) (use-style {:vertical-align "middle"})]
-                           x))))
-             [block-el block]])])]))])
+              (->> (for [{:keys [node/title block/string block/uid]} parents]
+                     [:span (use-style {:color "gray"} {:key uid}) (or title string)])
+                   (interpose ">")
+                   (map (fn [x]
+                          (if (= x ">")
+                            [(r/adapt-react-class mui-icons/KeyboardArrowRight) (use-style {:vertical-align "middle"})]
+                            x))))
+              [block-el block]])])]))])
 
 
 (defn node-page-component

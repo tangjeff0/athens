@@ -2,6 +2,7 @@
   (:require
     ["@material-ui/icons" :as mui-icons]
     [athens.db :as db]
+    [athens.style :refer [DEPTH-SHADOWS]]
     [athens.devcards.node-page :refer [node-page-component]]
     [cljsjs.react]
     [cljsjs.react.dom]
@@ -17,6 +18,36 @@
     [tick.locale-en-us]))
 
 ;;; Styles
+
+
+(stylefy/keyframes "content-appears"
+                   [:from
+                     {:opacity "0"}]
+                   [:to
+                    {:opacity "1"}])
+
+
+(def daily-notes-area-style
+  {:min-height "calc(100vh + 1px)"
+   :display        "flex"
+   :padding        "1.25rem 0"
+   :flex           "1 1 100%"
+   :flex-direction "column"})
+
+
+(def daily-notes-page-style
+  {:box-shadow (:16 DEPTH-SHADOWS)
+   :margin "1.25rem 2.5rem"
+   :padding "1rem 2rem"
+   :animation "content-appears 1s"
+   :border-radius "8px"
+   :min-height "calc(100vh - 10rem)"})
+ 
+
+(def daily-notes-notional-page-style
+  (merge daily-notes-page-style {:box-shadow "none"
+                                 :opacity "0.5"}))
+ 
 
 
 ;;; Helpers
@@ -55,15 +86,29 @@
 
 (defn scroll-daily-notes
   [e]
-  (let [rel-bottom    (.. js/document -documentElement getBoundingClientRect -bottom)
-        client-height (.. js/document -documentElement -clientHeight)
-        daily-notes @(subscribe [:daily-notes])]
-    (prn rel-bottom client-height)
-    (when (< rel-bottom (+ client-height 100))
+  (let
+   [rel-bottom    (.. js/document -documentElement getBoundingClientRect -bottom)
+    scroll-height     (.. js/document -documentElement -scrollHeight)
+    scroll-top     (.. js/document -documentElement -scrollTop)
+    client-height (.. js/document -documentElement -clientHeight)
+    daily-notes @(subscribe [:daily-notes])
+    dist-to-bottom (- rel-bottom client-height)]
+    (prn e 
+        ;;  "offset-top:" offset-top
+         " dist-to-bottom: " (- rel-bottom client-height)
+         " scroll-height: " scroll-height
+         " scroll-top: " scroll-top
+        ;;  " rel-bottom:" rel-bottom
+        ;;  " client-height:" client-height
+         )
+    ;; (when (< rel-bottom (+ client-height 100))
+    (when (< dist-to-bottom 100)
       (prn "DISPATCH")
       (dispatch [:next-daily-note (get-day (count daily-notes))]))))
 
-(def db-scroll-daily-notes (debounce scroll-daily-notes 500))
+(defn db-scroll-daily-notes [e]
+  (debounce (scroll-daily-notes e) 500))
+
 
 ;;; Scroll
 
@@ -72,33 +117,24 @@
 (defn daily-notes-panel
   []
   (let [note-refs (subscribe [:daily-notes])]
-    (if (empty? @note-refs)
+    (when (empty? @note-refs)
       (dispatch [:next-daily-note (get-day)]))
     (fn []
 
       (let [notes (pull-many db/dsdb
-                    '[*]
+                             '[*]
                     ;;'[:db/id :block/uid :block/string :block/open :block/order {:block/children ...}]
-                    (map (fn [x] [:block/uid x]) @note-refs))]
-        [:div.daily-notes (use-style {:display        "flex"
-                                      :flex           "0 0 auto"
-                                      :flex-direction "column"
-                                      :height "100vh"}
-                            {:on-scroll (fn [x] (prn "hi" x))})
-
+                             (map (fn [x] [:block/uid x]) @note-refs))]
+        [:div#daily-notes (use-style daily-notes-area-style)
          (doall
-           (for [{:keys [block/uid node/title]} @notes]
-             ^{:key uid}
-             [:<>
-              [:div (use-style {:min-height "550px"})
-               [:h1 title]]
-              ;;[node-page-component [:block/uid uid]]
-              [:hr (use-style {:border "1px solid black"
-                               :width  "100%"}
-                     {:key title})]]))
+          (for [{:keys [block/uid]} @notes]
+            ^{:key uid}
+            [:<>
+             [:div (use-style daily-notes-page-style)
+              [node-page-component [:block/uid uid]]]]))
 
-         [:div
-          [:h1 (use-style {:color "gray"}) "Preview"]]]))))
+         [:div (use-style daily-notes-notional-page-style)
+          [:h1 "Loading page..."]]]))))
 
 
 ;;; Devcards

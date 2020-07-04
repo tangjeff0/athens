@@ -111,7 +111,7 @@
          [initial-spinner-component]
          [:div (use-style app-wrapper-style)
           [left-sidebar]
-          [:div (use-style main-content-style
+          [:div#main-content (use-style main-content-style
                   {:on-scroll db-scroll-daily-notes})
            [match-panel (-> @current-route :data :name)]]
           [right-sidebar-component]

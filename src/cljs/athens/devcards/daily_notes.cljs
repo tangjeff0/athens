@@ -20,12 +20,6 @@
 ;;; Styles
 
 
-(stylefy/keyframes "content-appears"
-                   [:from
-                    {:opacity "0.5"}]
-                   [:to
-                    {:opacity "1"}])
-
 
 (def daily-notes-scroll-area-style
   {:min-height "calc(100vh + 1px)"
@@ -43,7 +37,6 @@
    :margin "1.25rem 2.5rem"
    :padding "1rem 2rem"
    :transition-duration "0s"
-   :animation "content-appears 1s"
    :border-radius "8px"
    :min-height "calc(100vh - 10rem)"})
 
@@ -117,7 +110,7 @@
                              '[*]
                     ;;'[:db/id :block/uid :block/string :block/open :block/order {:block/children ...}]
                              (map (fn [x] [:block/uid x]) @note-refs))]
-        [:div#daily-notes (use-style daily-notes-scroll-area-style)
+        [:div#daily-notes (use-style daily-notes-scroll-area-style )
          (doall
           (for [{:keys [block/uid]} @notes]
             ^{:key uid}
@@ -126,7 +119,7 @@
               [node-page-component [:block/uid uid]]]]))
 
          [:div (use-style daily-notes-notional-page-style)
-          [:h1 "One day earlier..."]]]))))
+          [:h1 "Earlier"]]]))))
 
 
 ;;; Devcards

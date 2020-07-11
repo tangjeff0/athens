@@ -3,12 +3,13 @@
     ["@material-ui/icons" :as mui-icons]
     [athens.db]
     [athens.style :refer [color DEPTH-SHADOWS ZINDICES]]
-    [athens.views.buttons :refer [button]]
+    [athens.views.buttons :refer [button new-button]]
     [athens.views.filters :refer [filters-el]]
     [cljsjs.react]
     [cljsjs.react.dom]
     [garden.selectors :as selectors]
-    [stylefy.core :as stylefy :refer [use-style]]))
+    [stylefy.core :as stylefy :refer [use-style]]
+    [reagent.core :as r]))
 
 
 ;;; Styles
@@ -136,6 +137,59 @@
 
 
 ;;; Components
+
+
+(def data
+  [[mui-icons/Done "Add Todo" "cmd-enter"]
+   [mui-icons/Description "Page Reference" "[["]
+   [mui-icons/Link "Block Reference" "(("]
+   [mui-icons/Timer "Current Time"]
+   [mui-icons/DateRange "Date Picker"]
+   [mui-icons/Attachment "Upload Image or File"]
+   [mui-icons/ExposurePlus1 "Word Count"]
+   [mui-icons/Today "Today"]])
+
+;;(defn new-dropdown
+;;  [{:keys [style]} content]
+;;  [:div (use-style (merge dropdown-style style))
+;;   content])
+
+;;(defn new-menu
+;;  [{:keys [style content]}]
+;;  [:div (use-style (merge menu-style style))
+;;   content])
+
+;;(defn new-menu-item
+;;  [{:keys [disabled label style]}]
+;;  [button {:label label :disabled disabled :style (merge menu-item-style style)}])
+
+
+;;(defn new-kbd
+;;  [text]
+;;  [:kbd (use-style kbd-style) text])
+
+;;(for [x [mui-icons/Face
+;;         mui-icons/Done]]
+;;  (r/adapt-react-class x))
+
+
+(defn new-slash-menu
+  [state]
+  (let [query   (:slash @state)
+        pattern (re-pattern (str "(?i)" query))
+        results (filter (fn [x]
+                          (re-find pattern (second x)))
+                  data)]
+    (prn (:slash @state))
+    [:div (use-style (merge dropdown-style {:position "absolute" :top "100%" :left "-0.125em"}))
+     [:div (use-style (merge menu-style {:max-height "8em"}))
+      (doall
+        (for [[icon cmd kbd-text] results]
+          [new-button {:key cmd :style menu-item-style :on-click #(prn cmd)}
+           [:<>
+            [(r/adapt-react-class icon)]
+            [:span cmd]
+            (when kbd-text [:kbd (use-style kbd-style) kbd-text])]]))]]))
 
 
 (defn slash-menu-component

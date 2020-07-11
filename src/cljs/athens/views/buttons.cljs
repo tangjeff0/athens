@@ -78,6 +78,17 @@
 
 ;;; Components
 
+(defn new-button
+  "Keep button interface as close to vanilla hiccup as possible.
+  Dissoc :style :active and :class because we don't want to merge them in directly.
+  Can pass in a :key prop to make react happy, as a :key or ^{:key}. Just works"
+  ([children] [new-button {} children])
+  ([{:keys [style active class] :as props} children]
+   (let [props- (dissoc props :style :active :class)]
+     [:button (use-style (merge buttons-style style)
+                (merge props- {:class (vec (flatten [(when active "is-active") class]))}))
+      children])))
+
 
 (defn button
   "Creates a button control"

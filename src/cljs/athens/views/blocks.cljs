@@ -6,7 +6,7 @@
     [athens.parse-renderer :refer [parse-and-render]]
     [athens.router :refer [navigate-uid]]
     [athens.style :refer [color DEPTH-SHADOWS OPACITIES]]
-    [athens.views.dropdown :refer [slash-menu-component #_menu dropdown]]
+    [athens.views.dropdown :refer [slash-menu-component new-slash-menu dropdown]]
     [cljsjs.react]
     [cljsjs.react.dom]
     [garden.selectors :as selectors]
@@ -343,12 +343,11 @@
                               [:div {:on-click #(navigate-uid uid)} title]))}])))
 
 
-;;TODO: more clarity on open? and closed? predicates, why we use `cond` in one case and `if` in another case)
 (defn block-el
-  "Two checks to make sure block is open or not: children exist and :block/open bool"
+  ":slash - nil or index of where slash begins. search with results from start index to selection start"
   [block]
   (let [state (r/atom {:atom-string (:block/string block)
-                       :slash? false
+                       :slash nil
                        :search/page false
                        :search/query nil
                        :search/block false
@@ -406,8 +405,11 @@
            [tooltip-el block state]
            [block-content-el block state]]
 
-          (when (:slash? @state)
-            [slash-menu-component {:style {:position "absolute" :top "100%" :left "-0.125em"}}])
+          (when-not (nil? (:slash @state))
+            [new-slash-menu state])
+          ;;(when (:slash? @state)
+          ;;  [slash-menu-component {:style {:position "absolute" :top "100%" :left "-0.125em"}}])
+
           [page-search-el block state]
 
           ;; Children

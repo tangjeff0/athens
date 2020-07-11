@@ -3,7 +3,7 @@
     ["@material-ui/icons" :as mui-icons]
     [athens.db :as db]
     [athens.router :refer [navigate navigate-uid]]
-    [athens.style :refer [cssv OPACITIES]]
+    [athens.style :refer [cssv OPACITIES toggle-theme!]]
     [athens.views.athena :refer [athena-prompt-el]]
     [athens.views.buttons :refer [button button-primary]]
     [cljsjs.react]
@@ -171,6 +171,8 @@
        ;; LOGO + BOTTOM BUTTONS
        [:footer (use-sub-style left-sidebar-style :footer)
         [:a (use-style notional-logotype-style {:href "https://github.com/athensresearch/athens" :target "_blank"}) "Athens"]
+        [button-primary {:label [:<> [:> mui-icons/Brightness3]]
+                         :on-click-fn #(toggle-theme!)}]
         [button-primary {:label "Load Test Data"
                          :on-click-fn #(dispatch [:get-db/init])}]]])))
 ;;[button {:disabled true

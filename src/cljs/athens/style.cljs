@@ -9,13 +9,15 @@
   ;; in the application's :root
   ([variable]
    ;; When the variable is alone, reformat it and pass it through
-  (str "var(--" variable ")"))
-  
+   (str "var(--" variable ")"))
   ([variable alpha]
    ;; 1. Create a new color with the requested alpha value
    ;; 1a. If this is a new color add it to the :root, with a logical name like "link-color-50" for blue at 50% opacity
    ;; 2. Return the custom property name of the new color
    (str "var(--" variable "-" alpha ")")))
+
+
+
 
 
 (def COLORS
@@ -156,33 +158,73 @@
 (stylefy/tag "html" base-styles)
 
 
-(stylefy/tag ":root" {:--link-color         (:link-color THEME-LIGHT)
-                      :--highlight-color    (:highlight-color THEME-LIGHT)
-                      :--warning-color      (:warning-color THEME-LIGHT)
-                      :--confirmation-color (:confirmation-color THEME-LIGHT)
-                      :--header-text-color  (:header-text-color THEME-LIGHT)
-                      :--body-text-color    (:body-text-color THEME-LIGHT)
-                      :--border-color       (:border-color THEME-LIGHT)
-                      :--background-minus-1 (:background-minus-1 THEME-LIGHT)
-                      :--background-minus-2 (:background-minus-2 THEME-LIGHT)
-                      :--background-color   (:background-color THEME-LIGHT)
-                      :--background-plus-1  (:background-plus-1 THEME-LIGHT)
-                      :--background-plus-2  (:background-plus-2 THEME-LIGHT)
-                      
-                      ::stylefy/media {{:prefers-color-scheme "dark"} {:--link-color         (:link-color THEME-DARK)
-                                                                       :--highlight-color    (:highlight-color THEME-DARK)
-                                                                       :--warning-color      (:warning-color THEME-DARK)
-                                                                       :--confirmation-color (:confirmation-color THEME-DARK)
-                                                                       :--header-text-color  (:header-text-color THEME-DARK)
-                                                                       :--body-text-color    (:body-text-color THEME-DARK)
-                                                                       :--border-color       (:border-color THEME-DARK)
-                                                                       :--background-minus-1 (:background-minus-1 THEME-DARK)
-                                                                       :--background-minus-2 (:background-minus-2 THEME-DARK)
-                                                                       :--background-color   (:background-color THEME-DARK)
-                                                                       :--background-plus-1  (:background-plus-1 THEME-DARK)
-                                                                       :--background-plus-2  (:background-plus-2 THEME-DARK)}}
+(def THEME (atom THEME-LIGHT))
+(def THEME-DARK? (atom false))
 
-                      })
+(defn kw-to-str
+  [kw]
+  (subs (str kw) 1))
+
+(defn css-theme-map
+  [theme]
+  (->> (map (fn [k]
+              (let [css-k (keyword (str "--" (kw-to-str k)))
+                    val   (k theme)]
+                [css-k val]))
+         (keys theme))
+    flatten
+    (apply hash-map)))
+
+
+(defn switch-theme!
+  [new-theme]
+  (reset! THEME new-theme)
+  (stylefy/tag ":root" (css-theme-map @THEME)))
+
+
+(defn toggle-theme!
+  []
+  (if @THEME-DARK?
+    (switch-theme! THEME-LIGHT)
+    (switch-theme! THEME-DARK))
+  (swap! THEME-DARK? not))
+
+
+(stylefy/tag ":root" (css-theme-map @THEME))
+
+
+
+;;::stylefy/media {{:prefers-color-scheme "dark"} {:--link-color         (:link-color THEME-DARK)
+;;                                                :--highlight-color    (:highlight-color THEME-DARK)
+;;                                                :--warning-color      (:warning-color THEME-DARK)
+;;                                                :--confirmation-color (:confirmation-color THEME-DARK)
+;;                                                :--header-text-color  (:header-text-color THEME-DARK)
+;;                                                :--body-text-color    (:body-text-color THEME-DARK)
+;;                                                :--border-color       (:border-color THEME-DARK)
+;;                                                :--background-minus-1 (:background-minus-1 THEME-DARK)
+;;                                                :--background-minus-2 (:background-minus-2 THEME-DARK)
+;;                                                :--background-color   (:background-color THEME-DARK)
+;;                                                :--background-plus-1  (:background-plus-1 THEME-DARK)
+;;                                                :--background-plus-2  (:background-plus-2 THEME-DARK)}}
+
+
+;; link-color
+;; background-color
+;; body-text-color
+
+(defn cssv!
+  ([kw]
+   (str "var(--" (kw-to-str kw) ")"))
+  ([kw alpha]
+   (let [core-kw (kw-to-str kw)
+         core-kw-a (str core-kw "-" (* 100 alpha))
+         theme-kw (keyword core-kw-a)
+         css-key (str "var(--"  core-kw-a ")")
+         new-val (color kw alpha)]
+        (swap! THEME assoc theme-kw new-val)
+        (switch-theme! @THEME)
+        css-key)))
+
 
 
 (stylefy/tag "*" {:box-sizing "border-box"})

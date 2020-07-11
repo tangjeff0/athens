@@ -1,7 +1,7 @@
 (ns athens.views.buttons
   (:require
     [athens.db]
-    [athens.style :refer [color cssv]]
+    [athens.style :refer [color cssv! cssv]]
     [cljsjs.react]
     [cljsjs.react.dom]
     [garden.selectors :as selectors]
@@ -37,14 +37,15 @@
    :border           "none"
    :display          "inline-flex"
    :align-items      "center"
-   :color            (cssv "link-color")
+   :color            (cssv! :link-color 0.5)
    :background-color "transparent"
    :transition       "all 0.075s ease"
    ::stylefy/manual [[:&:hover {:background (color :body-text-color :opacity-lower)}]
                      [:&:active
                       :&:hover:active
                       :&.is-active {:color (cssv "body-text-color")
-                                    :background-color  (color :body-text-color :opacity-low)}]
+                                    :background-color  (cssv! :background-color 0.9)}]
+                                    ;;:background-color  (color :body-text-color :opacity-low)}]
                      [:&:disabled :&:disabled:active {:color (color :body-text-color 0.3)
                                                       :background-color (color :body-text-color :opacity-lower)
                                                       :cursor "default"}]

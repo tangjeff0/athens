@@ -255,7 +255,7 @@
                 (doall
                   (for [{:block/keys [uid parents] :as block} group]
                     [:div (use-style references-group-block-style {:key (str "ref-" uid)})
-                ;; TODO: expand parent on click
+                     ;; TODO: expand parent on click
                      [block-el block]
                      (when (> (count parents) 1)
                        [breadcrumbs-list {:style reference-breadcrumbs-style}
@@ -272,6 +272,7 @@
   (let [{:keys [block/uid node/title] :as node} (db/get-node-document ident)
         editing-uid @(subscribe [:editing/uid])
         timeline-page? (is-timeline-page uid)
+        ;; todo: use one atom
         show-page-menu? (r/atom false)
         page-menu-position (r/atom {:x 0 :y 0})]
     (when-not (string/blank? title)
@@ -279,5 +280,4 @@
       (let [ref-groups [["Linked References" (-> title patterns/linked get-data)]
                         ["Unlinked References" (-> title patterns/unlinked get-data)]]]
         [node-page-el node editing-uid ref-groups timeline-page? show-page-menu?
-        ;;  is-shortcut?
          page-menu-position]))))

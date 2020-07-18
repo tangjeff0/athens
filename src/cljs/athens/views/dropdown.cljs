@@ -9,7 +9,7 @@
     [cljsjs.react.dom]
     [garden.selectors :as selectors]
     [re-frame.core :refer [dispatch]]
-    [stylefy.core :as stylefy :refer [use-style]]))
+    [stylefy.core :as stylefy :refer [use-style use-sub-style]]))
 
 
 ;;; Styles
@@ -146,20 +146,20 @@
 
 (defn page-menu-component
   [{:keys [style uid is-shortcut?]}]
-  [dropdown {:style (merge {:font-size "14px"} style) :content
-             [menu {:content
-                    [:<>
-                     (if is-shortcut?
-                       [:button (use-style menu-item-style {:on-click #(dispatch [:page/unmake-shortcut uid])})
-                        [:<>
-                         [:> mui-icons/BookmarkBorder]
-                         [:span "Remove Shortcut"]]]
-                       [:button (use-style menu-item-style {:on-click #(dispatch [:page/make-shortcut uid])})
-                        [:<>
-                         [:> mui-icons/Bookmark]
-                         [:span "Add Shortcut"]]])
-                     [menu-separator]
-                     [menu-item {:label [:<> [:> mui-icons/Delete] [:span "Delete Page"]]}]]}]}])
+  (let [shortcut-event (if is-shortcut? :page/remove-shortcut :page/add-shortcut)
+        shortcut-icon  (if is-shortcut? mui-icons/BookmarkBorder mui-icons/Bookmark)
+        shortcut-text  (if is-shortcut? "Remove Shortcut" "Add Shortcut")]
+    ;; TODO: i dont want dropdown then menu. i just want one div
+    ;; TODO: this component should be defined in node-page.cljs. need to merge style in directly. easier to reason about if together
+    [:div (use-style (merge dropdown-style {:font-size "14px"} style)
+            {:id "dropdown"})
+     [:div (use-style menu-style)
+      ;; TODO: use button component
+      [:button (use-style menu-item-style {:on-click #(dispatch [shortcut-event uid])})
+       [:<> [:> shortcut-icon] [:span shortcut-text]]]
+      [:hr (use-style menu-separator-style)]
+      [:button (use-style menu-item-style {:on-click #(prn "TODO: delete") :disabled true})
+       [:<> [:> mui-icons/Delete] [:span "Delete Page"]]]]]))
 
 
 (defn block-context-menu-component

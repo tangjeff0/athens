@@ -1,6 +1,7 @@
 (ns athens.events
   (:require
     [athens.db :as db :refer [rules]]
+    [athens.style :as style]
     [athens.util :refer [now-ts gen-block-uid]]
     [datascript.core :as d]
     [datascript.transit :as dt]
@@ -210,6 +211,17 @@
 
 
 ;; -- event-fx and Datascript Transactions -------------------------------
+
+;; Theme
+(reg-event-fx
+  :dark-theme/toggle
+  (fn [{:keys [db]} _]
+    (let [dark? (:dark-theme db)
+          theme (if dark? style/THEME-LIGHT style/THEME-DARK)]
+      {:db          (update db :dark-theme not)
+       :stylefy/tag {:name       ":root"
+                     :properties (style/remap-theme-keys theme)}})))
+
 
 ;; Import/Export
 

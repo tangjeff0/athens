@@ -177,6 +177,9 @@
           [:<> [:> mui-icons/Search] [:span "Find or Create a Page"]]]]
 
         [:div (use-style app-header-secondary-controls-style)
+         [button {:on-click #(dispatch [:dark-theme/toggle])}
+          [:> mui-icons/Brightness3]]
+         [separator]
          [button {:on-click #(reset! import-modal-open? true)}
           [:> mui-icons/Publish]]
          [separator]

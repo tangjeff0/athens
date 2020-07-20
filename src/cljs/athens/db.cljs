@@ -26,7 +26,8 @@
                :right-sidebar/items {}
                ;;:dragging-global     false
                :daily-notes/items   []
-               :selected/items   []})
+               :selected/items      []
+               :theme               athens.style/THEME-LIGHT})
 
 
 ;; -- JSON Parsing ----------------------------------------------------

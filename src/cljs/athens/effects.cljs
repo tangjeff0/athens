@@ -8,7 +8,8 @@
     [datascript.transit :as dt]
     [day8.re-frame.async-flow-fx]
     [posh.reagent :refer [transact!]]
-    [re-frame.core :refer [dispatch reg-fx]]))
+    [re-frame.core :refer [dispatch reg-fx]]
+    [stylefy.core :as stylefy]))
 
 
 ;;; Effects
@@ -48,6 +49,12 @@
         (if success
           (dispatch (conj on-success body))
           (dispatch (conj on-failure all)))))))
+
+
+(reg-fx
+  :stylefy/tag
+  (fn [{:keys [name properties]}]
+    (stylefy/tag name properties)))
 
 
 (reg-fx

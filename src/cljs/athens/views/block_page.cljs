@@ -104,8 +104,7 @@
         (when (not= string (:string/previous @state))
           (swap! state assoc :string/previous string :string/local string))
 
-        [:div.block-page (use-style page-style
-                                    {:data-uid uid})
+        [:div.block-page (use-style page-style {:data-uid uid})
          ;; Parent Context
          [:span {:style {:color "gray"}}
 

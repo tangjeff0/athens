@@ -21,6 +21,7 @@
 (def fs (js/require "fs"))
 (def path (js/require "path"))
 
+(def stream (js/require "stream"))
 
 (reg-event-fx
   :local-storage/get-db-filepath
@@ -156,13 +157,13 @@
 
 
 ;; TODO: implement with streams
-;;(def r (.. stream -Readable (from (dt/write-transit-str @db/dsdb))))
-;;(def w (.createWriteStream fs "./data/my-db.transit"))
-;;(.pipe r w)
 (reg-fx
   :fs/write!
   (fn [[filepath data]]
-    (.writeFileSync fs filepath data)))
+    (let [r (.. stream -Readable (from data))
+          w (.createWriteStream fs filepath)]
+      (.pipe r w))
+    #_(.writeFileSync fs filepath data)))
 
 
 (defn open-dialog!

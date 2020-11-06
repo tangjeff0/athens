@@ -6,6 +6,7 @@
     [athens.subs]
     #_[athens.util :as util]
     [athens.views.buttons :refer [button]]
+    [reagent.core :as r]
     [re-frame.core :refer [subscribe dispatch]]
     [stylefy.core :as stylefy :refer [use-style]]))
 
@@ -78,7 +79,8 @@
   (let [left-open?  (subscribe [:left-sidebar/open])
         right-open? (subscribe [:right-sidebar/open])
         route-name  (subscribe [:current-route/name])
-        theme-dark  (subscribe [:theme/dark])]
+        theme-dark  (subscribe [:theme/dark])
+        db-synced   (subscribe [:db/synced])]
     (fn []
       [:<>
        [:header (use-style app-header-style)
@@ -106,11 +108,11 @@
             [(r/adapt-react-class mui-icons/FolderOpen)
              {:style {:align-self "center"}}]]
          ;; sync UI
-         #_[(r/adapt-react-class mui-icons/FiberManualRecord)
-            {:style {:color      (color (if @db-synced
-                                          :confirmation-color
-                                          :highlight-color))
-                     :align-self "center"}}]
+         [(r/adapt-react-class mui-icons/FiberManualRecord)
+          {:style {:color      (color (if @db-synced
+                                        :confirmation-color
+                                        :highlight-color))
+                   :align-self "center"}}]
          #_[separator]
          [button {:on-click #(dispatch [:modal/toggle])
                   #_(swap! state assoc :modal :folder)}

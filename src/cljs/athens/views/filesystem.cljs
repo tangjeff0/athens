@@ -98,12 +98,15 @@
         [:div (use-style modal-style)
          [modal/modal
           {:title    [:div.modal__title
-                      [:h4 (if (:create @state)
+                      [:h4 (if create
                              "Create New Database"
                              "Current Database")]
                       (when-not @loading
                         [button {:on-click close-modal} [:> mui-icons/Close]])]
            :content  [:div (use-style modal-contents-style)
+
+                      ;; XXX: What happens when user moves db from filesystem manually?
+                      ;; More UI for showing that db name is technically a folder?
 
                       #_[:b {:style {:align-self "flex-start"}}
                          (if @loading
@@ -123,8 +126,8 @@
                                                          @loading "LOADING"
                                                          :else (electron/dirname-basename @db-filepath))})]
                         [:p (cond
-                              @loading "LOADING"
                               create electron/DOCS-DIR
+                              (and create @loading) electron/DOCS-DIR
                               :else (electron/dirname-dirname @db-filepath))]
 
                         [:div (use-style database-item-toolbar-style)

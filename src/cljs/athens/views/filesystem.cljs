@@ -86,8 +86,14 @@
                        :input    (electron/dirname-basename @db-filepath)})
         ref (atom nil)]
 
-    (fn []
+    (add-watch ref :focus
+               (fn [_k _atom _old new]
+                 (when new
+                   (when (or (:create @state)
+                             (:renaming @state))
+                     (.focus new)))))
 
+    (fn []
       (let [{:keys [create renaming input]} @state]
         [:div (use-style modal-style)
          [modal/modal
@@ -110,6 +116,7 @@
                         [:input (use-style db-name-style
                                            {:read-only (and (false? renaming) (false? create))
                                             :on-change #(swap! state assoc :input (.. % -target -value))
+                                            :ref       #(reset! ref %)
                                             :value     (cond
                                                          renaming input
                                                          create (electron/default-db-name)
@@ -122,13 +129,15 @@
 
                         [:div (use-style database-item-toolbar-style)
                          (cond
+                           @loading "LOADING"
                            create [button {:disabled @loading :on-click #(electron/move-dialog!)} "Move"]
                            renaming [:<>
                                      [button {:on-click #(swap! state update :renaming not)} "Save"]
                                      [:span "•"]
                                      [button {:on-click #(swap! state assoc :renaming false :input (electron/dirname-basename @db-filepath))} "Cancel"]]
                            :else [:<>
-                                  [button {:disabled @loading :on-click #(swap! state update :renaming not)} "Rename"] [:span "•"]
+                                  [button {:disabled @loading :on-click #(swap! state update :renaming not)} "Rename"]
+                                  [:span "•"]
                                   [button {:disabled @loading :on-click #(electron/move-dialog!)} "Move"]])]]
 
                        [:div (use-style {:display         "flex"

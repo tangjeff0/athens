@@ -55,7 +55,7 @@
 
 
 (default-db-name)
-(dirname-dirname @(subscribe [:db/filepath]))
+;;(dirname-dirname @(subscribe [:db/filepath]))
 
 ;;; Filesystem Dialogs
 

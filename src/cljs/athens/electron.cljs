@@ -27,6 +27,36 @@
 (def DB-INDEX "index.transit")
 (def IMAGES-DIR-NAME "images")
 
+(def DOCS-DIR (.getPath app "documents"))
+(def ATHENS-DIR (.resolve path DOCS-DIR "athens"))
+
+(defn dirname-basename
+  [db-filepath]
+  (->> db-filepath
+       (.dirname path)
+       (.basename path)))
+
+(defn dirname-dirname
+  [db-filepath]
+  (->> db-filepath
+       (.dirname path)
+       (.dirname path)))
+
+(defn default-db-name
+  []
+  (->> (if (not (.existsSync fs ATHENS-DIR))
+         ATHENS-DIR
+         (loop [i 1]
+           (let [dirpath (str ATHENS-DIR i)]
+             (if (not (.existsSync fs dirpath))
+               dirpath
+               (recur (inc i))))))
+       (.basename path)))
+
+
+(default-db-name)
+(dirname-dirname @(subscribe [:db/filepath]))
+
 ;;; Filesystem Dialogs
 
 
@@ -204,12 +234,10 @@
 (reg-event-fx
   :fs/create-new-db
   (fn []
-    (let [DOC-PATH    (.getPath app "documents")
-          athens-dir  (.resolve path DOC-PATH "athens")
-          db-filepath (.resolve path athens-dir DB-INDEX)
-          db-images   (.resolve path athens-dir IMAGES-DIR-NAME)]
-      (when (not (.existsSync fs athens-dir))
-        (.mkdirSync fs athens-dir))
+    (let [db-filepath (.resolve path ATHENS-DIR DB-INDEX)
+          db-images   (.resolve path ATHENS-DIR IMAGES-DIR-NAME)]
+      (when (not (.existsSync fs ATHENS-DIR))
+        (.mkdirSync fs ATHENS-DIR))
       (when (not (.existsSync fs db-images))
         (.mkdirSync fs db-images))
       {:fs/write!  [db-filepath (write-transit-str athens-datoms/datoms)]

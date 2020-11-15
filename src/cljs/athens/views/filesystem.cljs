@@ -81,94 +81,66 @@
                       (when-not @loading
                         (dispatch [:modal/toggle])))
         db-filepath (subscribe [:db/filepath])
-        state (r/atom {:create false
+        state (r/atom {:create   false
                        :renaming false
-                       :input ""})]
+                       :input    (electron/dirname-basename @db-filepath)})
+        ref (atom nil)]
+
     (fn []
-      [:div (use-style modal-style)
-       [modal/modal
-        {:title    [:div.modal__title
-                    [:h4 (if (:create @state)
-                           "Create New Database"
-                           "Current Database")]
-                    (when-not @loading
-                      [button {:on-click close-modal} [:> mui-icons/Close]])]
-         :content  [:div (use-style modal-contents-style)
-                    (if (:create @state)
-                      [:<>
-                       [:div (use-style database-item-style)
-                        [:> mui-icons/LibraryBooks]
-                        [:input
-                         (use-style db-name-style
-                                    {;; TODO: Autofocus doesn't seem to be working
-                                     :autoFocus true
-                                     :value "{Default database name}"})]
-                        [:p "{Default database location}"]
-                        [:div (use-style database-item-toolbar-style)
-                         [button {:disabled @loading
-                                  :on-click #(electron/move-dialog!)}
-                          "Move"]]]
-                       ;;  Displaying current database
-                       [:div (use-style {:display         "flex"
-                                         :justify-content "space-between"
-                                         :align-items     "center"
-                                         :width           "80%"})
-                        [button {:on-click #(swap! state update :create not)}
-                         [:<>
-                          [:> mui-icons/ArrowBack]
-                          [:span "Back"]]]
-                        [button {:primary true
-                                 :on-click #(swap! state update :create not)}
-                         [:<>
-                          [:> mui-icons/Add]
-                          [:span "Create"]]]]]
+
+      (let [{:keys [create renaming input]} @state]
+        [:div (use-style modal-style)
+         [modal/modal
+          {:title    [:div.modal__title
+                      [:h4 (if (:create @state)
+                             "Create New Database"
+                             "Current Database")]
+                      (when-not @loading
+                        [button {:on-click close-modal} [:> mui-icons/Close]])]
+           :content  [:div (use-style modal-contents-style)
+
+                      #_[:b {:style {:align-self "flex-start"}}
+                         (if @loading
+                           "No DB Found At"
+                           "Current Location")]
 
                       [:<>
-                      ;;  [:b {:style {:align-self "flex-start"}}
-                      ;;   (if @loading
-                      ;;     "No DB Found At"
-                      ;;     "Current Location")]
-                        ;; Displaying current database
                        [:div (use-style database-item-style)
                         [:> mui-icons/LibraryBooks]
-                        [:input
-                         (use-style db-name-style
-                                    {:read-only (not (:renaming @state))
-                                     ;; TODO: Autofocus doesn't seem to be working
-                                     :autoFocus (:renaming @state)
-                                     :value (nth (reverse (str/split @db-filepath #"/")) 1)})]
-                        [:p (->> (reverse (str/split @db-filepath #"/")) (drop 2) (reverse) (str/join "/"))]
+                        [:input (use-style db-name-style
+                                           {:read-only (and (false? renaming) (false? create))
+                                            :on-change #(swap! state assoc :input (.. % -target -value))
+                                            :value     (cond
+                                                         renaming input
+                                                         create (electron/default-db-name)
+                                                         @loading "LOADING"
+                                                         :else (electron/dirname-basename @db-filepath))})]
+                        [:p (cond
+                              @loading "LOADING"
+                              create electron/DOCS-DIR
+                              :else (electron/dirname-dirname @db-filepath))]
+
                         [:div (use-style database-item-toolbar-style)
-                         (if (:renaming @state)
-                           [:<>
-                            [button
-                             {:on-click #(swap! state update :renaming not)}
-                             "Save"]
-                            [:span "•"]
-                            [button
-                             {:on-click #(swap! state update :renaming not)}
-                             "Cancel"]]
-                           [:<>
-                            [button {:disabled @loading
-                                     :on-click #(swap! state update :renaming not)}
-                             "Rename"]
-                            [:span "•"]
-                            [button {:disabled @loading
-                                     :on-click #(electron/move-dialog!)}
-                             "Move"]])]]
-                       ;;  Displaying current database
+                         (cond
+                           create [button {:disabled @loading :on-click #(electron/move-dialog!)} "Move"]
+                           renaming [:<>
+                                     [button {:on-click #(swap! state update :renaming not)} "Save"]
+                                     [:span "•"]
+                                     [button {:on-click #(swap! state assoc :renaming false :input (electron/dirname-basename @db-filepath))} "Cancel"]]
+                           :else [:<>
+                                  [button {:disabled @loading :on-click #(swap! state update :renaming not)} "Rename"] [:span "•"]
+                                  [button {:disabled @loading :on-click #(electron/move-dialog!)} "Move"]])]]
+
                        [:div (use-style {:display         "flex"
                                          :justify-content "space-between"
                                          :align-items     "center"
                                          :width           "80%"})
-                        [button {:primary true
-                                 :on-click #(electron/open-dialog!)}
-                         [:<>
-                          [:> mui-icons/FolderOpen]
-                          [:span "Open"]]]
-                        [button {:primary true
-                                 :on-click #(swap! state update :create not)}
-                         [:<>
-                          [:> mui-icons/Add]
-                          [:span "New"]]]]])]
-         :on-close close-modal}]])))
+                        (if create
+                          [:<>
+                           [button {:on-click #(swap! state update :create not)} [:<> [:> mui-icons/ArrowBack] [:span "Back"]]]
+                           [button {:primary true :on-click #(prn "CREATE")} [:<> [:> mui-icons/Add] [:span "Create"]]]]
+                          [:<>
+                           [button {:primary true :on-click #(electron/open-dialog!)} [:<> [:> mui-icons/FolderOpen] [:span "Open"]]]
+                           [button {:primary true :on-click #(swap! state update :create not)} [:<> [:> mui-icons/Add] [:span "New"]]]])]]]
+
+           :on-close close-modal}]]))))

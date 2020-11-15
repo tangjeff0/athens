@@ -23,11 +23,11 @@
    :display "flex"
    :justify-content "space-between"
    :padding-top "2.75rem"
-   :transition-property "width, border, background"
+   :transition-property "width, border"
    :transition-duration "0.35s"
    :transition-timing-function "ease-out"
    :background-color (color :background-minus-1)
-   :box-shadow [["0 -100px 0 " (color :background-minus-1) ", inset 1px 0 " (color :background-minus-1)]]
+   :box-shadow [["0 -100px 0 " (color :background-minus-1)]]
    ::stylefy/manual [[:svg {:color (color :body-text-color :opacity-high)}]
                      [:&.is-dragging {:transition-duration "0s"}]
                      [:&.is-closed {:width "0"}]
@@ -40,9 +40,10 @@
    :flex "1 1 100%"
    :flex-direction "column"
    :margin-left "0"
-   :transition "all 0.35s ease-out"
+   :transition "opacity 0.35s ease-out"
    :overflow-y "auto"
-   ::stylefy/manual [[:&.is-closed {:opacity 0}]
+   ::stylefy/manual [[:&.is-closed {:opacity 0
+                                    :min-width "var(--parent-width)"}]
                      [:&.is-open {:opacity 1}]]})
 
 
@@ -149,18 +150,18 @@
 
 
 (def drag-handle-style
-  {:cursor           "col-resize"
-   :height           "100%"
-   :position         "absolute"
-   :top              0
-   :width            "1px"
-   :overflow         "visible"
-   :z-index          (:zindex-fixed ZINDICES)
+  {:cursor "col-resize"
+   :height "100%"
+   :position "absolute"
+   :top 0
+   :width "1px"
+   :overflow "visible"
+   :background (color :background-minus-2)
+   :z-index (:zindex-fixed ZINDICES)
    ::stylefy/manual [;; Using the :before element as a spacer, to add extra mouseable area.
                      ;; :after element is the visible drag handle.
                      [:&:before {:content "''"
                                  :position "absolute"
-                                 :transition "all 0.1s ease"
                                  :opacity 0
                                  :top 0
                                  :bottom 0
@@ -214,7 +215,8 @@
                                               (when open? {:style {:width (str (:width @state) "vw")}}))
                                   [:div (use-style drag-handle-style
                                          {:on-mouse-down #(swap! state assoc :dragging true)})]
-                                  [:div (use-style sidebar-content-style {:class (if open? "is-open" "is-closed")})
+                                  [:div (merge (use-style sidebar-content-style {:class (if open? "is-open" "is-closed")})
+                                                          {:style {"--parent-width" (str (:width @state) "vw")}})
                                    ;; [:header (use-style sidebar-section-heading-style)] ;; Waiting on additional sidebar contents
                                    ;;  [:h1 "Pages and Blocks"]]
                                    ;;  [button [:> mui-icons/FilterList]]

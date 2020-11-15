@@ -133,7 +133,7 @@
                         [:div (use-style database-item-toolbar-style)
                          (cond
                            @loading "LOADING"
-                           create [button {:disabled @loading :on-click #(electron/move-dialog!)} "Move"]
+                           create nil
                            renaming [:<>
                                      [button {:on-click #(swap! state update :renaming not)} "Save"]
                                      [:span "•"]

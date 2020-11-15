@@ -210,13 +210,13 @@
        :reagent-render         (fn [open? items _]
                                  [:div (merge (use-style sidebar-style
                                                          {:class (doall
-                                                                  (if open? "is-open" "is-closed")
-                                                                  (when (:dragging @state) " is-dragging"))})
+                                                                   (if open? "is-open" "is-closed")
+                                                                   (when (:dragging @state) " is-dragging"))})
                                               (when open? {:style {:width (str (:width @state) "vw")}}))
                                   [:div (use-style drag-handle-style
-                                         {:on-mouse-down #(swap! state assoc :dragging true)})]
+                                                   {:on-mouse-down #(swap! state assoc :dragging true)})]
                                   [:div (merge (use-style sidebar-content-style {:class (if open? "is-open" "is-closed")})
-                                                          {:style {"--parent-width" (str (:width @state) "vw")}})
+                                               {:style {"--parent-width" (str (:width @state) "vw")}})
                                    ;; [:header (use-style sidebar-section-heading-style)] ;; Waiting on additional sidebar contents
                                    ;;  [:h1 "Pages and Blocks"]]
                                    ;;  [button [:> mui-icons/FilterList]]

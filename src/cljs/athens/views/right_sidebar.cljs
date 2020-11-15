@@ -23,7 +23,7 @@
    :display "flex"
    :justify-content "space-between"
    :padding-top "2.75rem"
-   :transition-property "width, border"
+   :transition-property "width"
    :transition-duration "0.35s"
    :transition-timing-function "ease-out"
    :background-color (color :background-minus-1)

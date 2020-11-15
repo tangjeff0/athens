@@ -31,8 +31,7 @@
    ::stylefy/manual [[:svg {:color (color :body-text-color :opacity-high)}]
                      [:&.is-dragging {:transition-duration "0s"}]
                      [:&.is-closed {:width "0"}]
-                     [:&.is-open {:width "32vw"
-                                  :background-color (color :background-minus-1)}]]})
+                     [:&.is-open {:background-color (color :background-minus-1)}]]})
 
 
 (def sidebar-content-style

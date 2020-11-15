@@ -23,27 +23,27 @@
    :display "flex"
    :justify-content "space-between"
    :padding-top "2.75rem"
-   ;;:transition-property "width, border, background"
-   ;;:transition-duration "0.35s"
-   ;;:transition-timing-function "ease-out"
+   :transition-property "width, border, background"
+   :transition-duration "0.35s"
+   :transition-timing-function "ease-out"
    :background-color (color :background-minus-1)
    :box-shadow [["0 -100px 0 " (color :background-minus-1) ", inset 1px 0 " (color :background-minus-1)]]
    ::stylefy/manual [[:svg {:color (color :body-text-color :opacity-high)}]
+                     [:&.is-dragging {:transition-duration "0s"}]
                      [:&.is-closed {:width "0"}]
-                     [:&.is-open {}]]});:width "32vw"
-                                  ;;:background-color (color :background-minus-1)}]]})
+                     [:&.is-open {:width "32vw"
+                                  :background-color (color :background-minus-1)}]]})
 
 
 (def sidebar-content-style
   {:display "flex"
-   :flex "0 0 32vw"
+   :flex "1 1 100%"
    :flex-direction "column"
    :margin-left "0"
-   ;;:transition "all 0.35s ease-out"
+   :transition "all 0.35s ease-out"
    :overflow-y "auto"
-   ::stylefy/manual []});[:&.is-closed {:margin-left "-32vw"
-                     ;;:opacity 0
-                     ;;[:&.is-open {:opacity 1}]]})
+   ::stylefy/manual [[:&.is-closed {:opacity 0}]
+                     [:&.is-open {:opacity 1}]]})
 
 
 (def sidebar-section-heading-style
@@ -81,12 +81,11 @@
 
 
 (def sidebar-item-container-style
-  {:padding "0 2rem 1.25rem"
+  {:padding "0 0 1.25rem"
    :line-height "1.5rem"
    :font-size "15px"
    :position "relative"
-   :z-index 1
-   :width "32vw"})
+   :z-index 1})
 
 
 (def sidebar-item-heading-style
@@ -149,6 +148,27 @@
                      [:p {:max-width "13em"}]]})
 
 
+(def drag-handle-style
+  {:cursor           "col-resize"
+   :height           "100%"
+   :position         "absolute"
+   :top              0
+   :width            "1px"
+   :overflow         "visible"
+   :z-index          (:zindex-fixed ZINDICES)
+   ::stylefy/manual [;; Using the :before element as a spacer, to add extra mouseable area.
+                     ;; :after element is the visible drag handle.
+                     [:&:before {:content "''"
+                                 :position "absolute"
+                                 :transition "all 0.1s ease"
+                                 :opacity 0
+                                 :top 0
+                                 :bottom 0
+                                 :left "-3px"
+                                 :right "-3px"
+                                 :z-index 1}]]})
+
+
 ;;; Components
 
 
@@ -187,17 +207,13 @@
                                  (js/document.removeEventListener "mousemove" move-handler)
                                  (js/document.removeEventListener "mouseup" mouse-up-handler))
        :reagent-render         (fn [open? items _]
-                                 [:div (use-style (merge sidebar-style
-                                                         (when open? {:width (str (:width @state) "vw")}))
-                                                  {:class (if open? "is-open" "is-closed")})
-                                  [:div (use-style {:cursor           "col-resize"
-                                                    :height           "100%"
-                                                    :position         "absolute"
-                                                    :top              0
-                                                    :width            "3px"
-                                                    :z-index          (:zindex-fixed ZINDICES)
-                                                    :background-color (color :border-color)}
-                                                   {:on-mouse-down #(swap! state assoc :dragging true)})]
+                                 [:div (merge (use-style sidebar-style
+                                                         {:class (doall
+                                                                  (if open? "is-open" "is-closed")
+                                                                  (when (:dragging @state) " is-dragging"))})
+                                              (when open? {:style {:width (str (:width @state) "vw")}}))
+                                  [:div (use-style drag-handle-style
+                                         {:on-mouse-down #(swap! state assoc :dragging true)})]
                                   [:div (use-style sidebar-content-style {:class (if open? "is-open" "is-closed")})
                                    ;; [:header (use-style sidebar-section-heading-style)] ;; Waiting on additional sidebar contents
                                    ;;  [:h1 "Pages and Blocks"]]

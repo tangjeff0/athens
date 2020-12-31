@@ -769,6 +769,7 @@
                             is-selected? nil
                             (or (neg? y) (< y middle-y)) :above
                             (or (not open) (and (empty? children) (< 50 x))) :child
+                            ;; fix: doesn't work when last block, closed, with children
                             (< middle-y y) :below)]
     (when target
       (swap! state assoc :drag-target target))))

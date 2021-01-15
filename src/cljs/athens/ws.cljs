@@ -72,7 +72,10 @@
 (rf/reg-event-fx
   :ws/make-ws
   (fn [_ _]
-    (make-websocket! (str "wss://" "9c6b44e2076a.ngrok.io" #_"localhost:3001" "/ws") update-messages!)))
+    (let [ws-prefix (if (= (.. js/window -location -protocol) "https:")
+                      "wss://"
+                      "ws://")]
+      (make-websocket! (str ws-prefix "5c377b6594da.ngrok.io" "/ws") update-messages!))))
 
 
 (rf/reg-event-fx

@@ -34,35 +34,34 @@
     (throw (js/Error. "Websocket connection failed!"))))
 
 
+;; Re-frame
+
+(rf/reg-event-fx
+  :ws/on-connect
+  (fn [_ [_ data]]
+    (let [db (dt/read-transit-str (:message data))]
+      (dispatch [:reset-conn db]))))
+
+
 (defn update-messages! [data]
   (prn "UPDATE" data)
   (case (:type data)
     ;;:tx (p/transact! conn (:message message))
-    :connect (let [db (dt/read-transit-str (:message data))]
-               (dispatch [:reset-conn db]))))
+    :connect (dispatch [:ws/on-connect data])))
 
-
-;; Re-frame
-
-
-#_(rf/reg-event-fx
-    :ws/boot
-    (fn [_ _]
-      {:async-flow {:first-dispatch [:local-storage/get-db-filepath]
-                    :rules          [{:when        :seen?
-                                      :events      :db/update-filepath
-                                      :dispatch-fn (fn [[_ filepath]])}
-
-                                     ;; if first time, go to Daily Pages and open left-sidebar
-
-                                     {:when       :seen-any-of?
-                                      :events     [:fs/create-new-db :reset-conn]
-                                      :dispatch-n [[:db/retract-athens-pages]
-                                                   [:db/transact-athens-pages]
-                                                   [:loading/unset]]
-                                      :halt?      true}]}}))
 
 (rf/reg-event-fx
   :ws/boot
+  (fn [_ _]
+    {:db         db/rfdb
+     :async-flow {:first-dispatch [:ws/make-ws]
+                  :rules          [{:when     :seen?
+                                    :events   :ws/on-connect
+                                    :dispatch [:loading/unset]
+                                    :halt?    true}]}}))
+
+
+(rf/reg-event-fx
+  :ws/make-ws
   (fn [_ _]
     (make-websocket! (str "ws://" "2b2bc78ecc54.ngrok.io" #_"localhost:3001" "/ws") update-messages!)))

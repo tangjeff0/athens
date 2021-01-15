@@ -72,7 +72,7 @@
 (rf/reg-event-fx
   :ws/make-ws
   (fn [_ _]
-    (make-websocket! (str "ws://" "9c6b44e2076a.ngrok.io" #_"localhost:3001" "/ws") update-messages!)))
+    (make-websocket! (str "wss://" "9c6b44e2076a.ngrok.io" #_"localhost:3001" "/ws") update-messages!)))
 
 
 (rf/reg-event-fx

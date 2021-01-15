@@ -18,7 +18,7 @@
                                              day8.re-frame-10x.preload]
                                   :http-root    "resources/public"
                                   :http-port    3000}}
-          
+
           :renderer {:target :browser
                      :output-dir "resources/public/js/compiled"
                      :asset-path "js/compiled"

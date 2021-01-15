@@ -47,7 +47,7 @@
 (rf/reg-event-fx
   :ws/on-connect
   (fn [_ [_ data]]
-    (let [db (dt/read-transit-str (:message data))]
+    (let [db (:message data)]
       (dispatch [:reset-conn db]))))
 
 

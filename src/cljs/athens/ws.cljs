@@ -5,6 +5,7 @@
     [athens.util :as util]
     [datascript.core :as d]
     [datascript.transit :as dt :refer [write-transit-str]]
+    [posh.reagent :as p]
     [day8.re-frame.async-flow-fx]
     [goog.functions :refer [debounce]]
     [re-frame.core :as rf :refer [reg-event-db reg-event-fx inject-cofx reg-fx dispatch dispatch-sync subscribe reg-sub]]))
@@ -22,6 +23,13 @@
       (->> msg
            .-data
            datascript.transit/read-transit-str))))
+
+(defn send-transit-msg!
+  [msg]
+  (if @ws-chan
+    (.send @ws-chan
+           (dt/write-transit-str msg))
+    (throw (js/Error. "Websocket is not available!"))))
 
 
 (defn make-websocket! [url receive-handler]
@@ -46,7 +54,7 @@
 (defn update-messages! [data]
   (prn "UPDATE" data)
   (case (:type data)
-    ;;:tx (p/transact! conn (:message message))
+    :tx  (p/transact! db/dsdb (:message data))
     :connect (dispatch [:ws/on-connect data])))
 
 
@@ -65,3 +73,9 @@
   :ws/make-ws
   (fn [_ _]
     (make-websocket! (str "ws://" "2b2bc78ecc54.ngrok.io" #_"localhost:3001" "/ws") update-messages!)))
+
+
+(rf/reg-event-fx
+  :ws/tx
+  (fn [_ [_ tx-data]]
+    (send-transit-msg! {:type :tx :message tx-data})))

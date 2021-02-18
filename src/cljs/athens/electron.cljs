@@ -402,10 +402,17 @@
       (.pipe r w)))
 
 
-  (def debounce-write (debounce write-file 15000))
+  (defn sync-aws
+    [filepath data]
+    (prn "SYNC AWS")
+    (dispatch [:ws/tx "foo bar"]))
 
+
+  (def debounce-write (debounce write-file 1000))
+  (def debounce-sync-aws (debounce sync-aws 1000))
 
   (reg-fx
     :fs/write!
     (fn [[filepath data]]
-      (debounce-write filepath data))))
+      (debounce-write filepath data)
+      (debounce-sync-aws filepath data))))

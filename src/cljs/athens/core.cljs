@@ -14,7 +14,7 @@
     [athens.subs]
     [athens.util :as util]
     [athens.views :as views]
-    ;;[athens.ws]
+    [athens.ws]
     [goog.dom :refer [getElement]]
     [re-frame.core :as rf]
     [reagent.dom :as r-dom]
@@ -84,7 +84,8 @@
   (stylefy/tag "body" style/app-styles)
   (listeners/init)
   (if (util/electron?)
-    (rf/dispatch-sync [:boot/desktop])
+    (do (rf/dispatch-sync [:boot/desktop])
+        (rf/dispatch-sync [:boot/ws]))
     (rf/dispatch-sync [:boot/web]))
   (dev-setup)
   (mount-root))

@@ -3,10 +3,6 @@
   "author": "athensresearch",
   "version": "1.0.0-beta.60",
   "description": "An open-source alternative to Roam Research",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/athensresearch/athens/"
-  },
   "scripts": {
     "update:dry": "standard-version --dry-run -p --releaseCommitMessageFormat v{{currentTag}}",
     "update": "standard-version -p --releaseCommitMessageFormat v{{currentTag}}",

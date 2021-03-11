@@ -46,6 +46,9 @@
         "AppImage"
       ],
       "category": "Office"
+    },
+    "publish": {
+      "provider": "github"
     }
   },
   "dependencies": {

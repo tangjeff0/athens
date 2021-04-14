@@ -162,8 +162,8 @@
                              :on-click #(swap! state update :remote? not)}
                      (if (:remote? @state)
                        [:div {:style {:display "flex"}}
-                        [:> ToggleOn
-                         {:color "red"}]
+                        [:> ToggleOn]
+                         ;;{:color "primary"}]
                         [:span "Remote"]]
                        [:div {:style {:display "flex"}}
                         [:> ToggleOff]

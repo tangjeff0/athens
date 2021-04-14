@@ -21,6 +21,7 @@
     [athens.views.buttons :refer [button]]
     [athens.views.filesystem :as filesystem]
     [athens.views.presence :as presence]
+    [athens.ws-client :as ws-client]
     [re-frame.core :refer [subscribe dispatch]]
     [reagent.core :as r]
     [stylefy.core :as stylefy :refer [use-style]]))
@@ -100,69 +101,72 @@
         socket-status     (subscribe [:socket-status])
         merge-open? (reagent.core/atom false)]
     (fn []
-      [:<>
+      (let [sync-color (color (cond
+                                (= @socket-status :closed)
+                                :error-color
 
+                                (or (and (:default? @remote-graph-conf)
+                                         (= @socket-status :running))
+                                    @(subscribe [:db/synced]))
+                                :confirmation-color
 
-       (when @merge-open?
-         [filesystem/merge-modal merge-open?])
+                                :else :highlight-color))]
+        [:<>
+         (when @merge-open?
+           [filesystem/merge-modal merge-open?])
 
-       [:header (use-style app-header-style)
-        [:div (use-style app-header-control-section-style)
-         [button {:active   @left-open?
-                  :on-click #(dispatch [:left-sidebar/toggle])}
-          [:> Menu]]
-         [separator]
-         ;; TODO: refactor to effects
-         (when electron?
-           [:<>
-            [button {:on-click #(.back js/window.history)} [:> ChevronLeft]]
-            [button {:on-click #(.forward js/window.history)} [:> ChevronRight]]
-            [separator]])
-         [button {:on-click router/nav-daily-notes
-                  :active   (= @route-name :home)} [:> Today]]
-         [button {:on-click #(router/navigate :pages)
-                  :active   (= @route-name :pages)} [:> FileCopy]]
-         [button {:on-click #(router/navigate :graph)
-                  :active   (= @route-name :graph)} [:> BubbleChart]]
-         ;; below is used for testing error tracking
-         #_[button {:on-click #(throw (js/Error "error"))
-                    :style {:border "1px solid red"}} [:> Warning]]
-         [button {:on-click #(dispatch [:athena/toggle])
-                  :style    {:width "14rem" :margin-left "1rem" :background (color :background-minus-1)}
-                  :active   @(subscribe [:athena/open])}
-          [:<> [:> Search] [:span "Find or Create a Page"]]]]
+         [:header (use-style app-header-style)
+          [:div (use-style app-header-control-section-style)
+           [button {:active   @left-open?
+                    :on-click #(dispatch [:left-sidebar/toggle])}
+            [:> Menu]]
+           [separator]
+           ;; TODO: refactor to effects
+           (when electron?
+             [:<>
+              [button {:on-click #(.back js/window.history)} [:> ChevronLeft]]
+              [button {:on-click #(.forward js/window.history)} [:> ChevronRight]]
+              [separator]])
+           [button {:on-click router/nav-daily-notes
+                    :active   (= @route-name :home)} [:> Today]]
+           [button {:on-click #(router/navigate :pages)
+                    :active   (= @route-name :pages)} [:> FileCopy]]
+           [button {:on-click #(router/navigate :graph)
+                    :active   (= @route-name :graph)} [:> BubbleChart]]
+           ;; below is used for testing error tracking
+           #_[button {:on-click #(throw (js/Error "error"))
+                      :style {:border "1px solid red"}} [:> Warning]]
+           [button {:on-click #(dispatch [:athena/toggle])
+                    :style    {:width "14rem" :margin-left "1rem" :background (color :background-minus-1)}
+                    :active   @(subscribe [:athena/open])}
+            [:<> [:> Search] [:span "Find or Create a Page"]]]]
 
-        [:div (use-style app-header-secondary-controls-style)
-         (if electron?
-           [:<>
-            [presence/presence-popover-info]
-            [(reagent.core/adapt-react-class FiberManualRecord)
-             {:style {:color      (color (cond
-                                           (= @socket-status :closed)
-                                           :error-color
-
-                                           (or (and (:default? @remote-graph-conf)
-                                                    (= @socket-status :running))
-                                               @(subscribe [:db/synced]))
-                                           :confirmation-color
-
-                                           :else :highlight-color))
-                      :align-self "center"}}]
-            [button {:on-click #(swap! merge-open? not)}
-             [:> MergeType]]
-            [button {:on-click #(router/navigate :settings)
-                     :active   (= @route-name :settings)}
-             [:> Settings]]
-            [button {:on-click #(dispatch [:modal/toggle])}
-             [:> FolderOpen]]
-            [separator]]
-           [button {:on-click #(dispatch [:get-db/init]) :primary true} "Load Test DB"])
-         [button {:on-click #(dispatch [:theme/toggle])}
-          (if @theme-dark
-            [:> ToggleOff]
-            [:> ToggleOn])]
-         [separator]
-         [button {:active   @right-open?
-                  :on-click #(dispatch [:right-sidebar/toggle])}
-          [:> VerticalSplit {:style {:transform "scaleX(-1)"}}]]]]])))
+          [:div (use-style app-header-secondary-controls-style)
+           (if electron?
+             [:<>
+              [presence/presence-popover-info]
+              [(reagent.core/adapt-react-class FiberManualRecord)
+               {:style    (cond->
+                            {:align-self "center"
+                             :color      sync-color}
+                            (= @socket-status :closed) (assoc :cursor "pointer"))
+                :on-click #(ws-client/start-socket! (assoc @remote-graph-conf
+                                                       :reload-on-init? true))}]
+              [button {:on-click #(swap! merge-open? not)}
+               [:> MergeType]]
+              [button {:on-click #(router/navigate :settings)
+                       :active   (= @route-name :settings)}
+               [:> Settings]]
+              [button {:on-click #(dispatch [:modal/toggle])}
+               [:> FolderOpen]]
+              [separator]]
+             [button {:on-click #(dispatch [:get-db/init]) :primary true} "Load Test DB"])
+           [button {:on-click #(dispatch [:theme/toggle])}
+            (if @theme-dark
+              [:> ToggleOff]
+              [:> ToggleOn])]
+           [separator]
+           [button {:active   @right-open?
+                    :on-click #(dispatch [:right-sidebar/toggle])}
+            [:> VerticalSplit {:style {:transform "scaleX(-1)"}}]]]]]))))
 

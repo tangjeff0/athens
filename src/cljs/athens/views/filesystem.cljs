@@ -12,6 +12,7 @@
     #_[athens.util :as util]
     [athens.views.buttons :refer [button]]
     [athens.views.modal :refer [modal-style]]
+    [athens.views.textinput :as textinput]
     [athens.ws-client :as ws-client]
     [cljs.reader :refer [read-string]]
     [clojure.edn :as edn]
@@ -186,18 +187,18 @@
                                     [:div {:style {:margin          "5px 0"
                                                    :display         "flex"
                                                    :justify-content "space-between"}}
-                                     [:input {:style       {:width   "100%"
-                                                            :padding "5px"}
-                                              :type        (or input-type "text")
-                                              :value       (key @remote-graph-conf)
-                                              :placeholder placeholder
-                                              :on-change   #(rf/dispatch [:remote-graph/set-conf key (.. % -target -value)])}]]]))
+                                     [textinput/textinput {:style       {:flex-grow 1
+                                                                         :padding "5px"}
+                                                           :type        (or input-type "text")
+                                                           :value       (key @remote-graph-conf)
+                                                           :placeholder placeholder
+                                                           :on-change   #(rf/dispatch [:remote-graph/set-conf key (.. % -target -value)])}]]]))
                             doall)
                        [button {:primary  true
                                 :style    {:margin-top "1.5rem"}
                                 :on-click #(ws-client/start-socket! (assoc @remote-graph-conf
                                                                       :reload-on-init? true))}
-                        "Open"]]
+                        "Connect"]]
 
                       (and (not (:remote? @state))
                            (:create @state))

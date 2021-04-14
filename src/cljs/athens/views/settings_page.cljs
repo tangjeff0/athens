@@ -148,6 +148,12 @@
     (js/localStorage.setItem "debounce-save-time" value)))
 
 
+(defn handle-user-name-change
+  [e]
+  (do (dispatch [:user/set :name (.. e -target -value)])
+      (js/localStorage.setItem "user/name" (.. e -target -value))))
+
+
 ;; Components
 
 
@@ -175,8 +181,8 @@
                          (:email @s))]]
         [:main
          [:div
-          [textinput/textinput {:type        " email "
-                                :placeholder " Open Collective Email "
+          [textinput/textinput {:type        "email"
+                                :placeholder "Open Collective Email"
                                 :on-change   #(reset! value (.. % -target -value))
                                 :value       @value}]
           [button {:primary  true
@@ -250,6 +256,27 @@
      [button {:disabled true} "Backup my DB to the cloud"]]]])
 
 
+(defn remote-comp
+  [_s]
+  (let [remote-graph-conf @(subscribe [:db/remote-graph-conf])
+        remote?           (:default? remote-graph-conf)]
+    [setting-wrapper
+     (when (not remote?) {:disabled true})
+     [:<>
+      [:header
+       [:h3 "Username"]
+       [:span.glance (:name @(subscribe [:user/current]))]]
+      [:main
+       [textinput/textinput {:type         "text"
+                             :placeholder  "Username"
+                             :disabled     (not remote?)
+                             :on-blur      handle-user-name-change
+                             :defaultValue (:name @(subscribe [:user/current]))}]
+       [:aside
+        [:p "For now, a username is only needed if you are connected to a server."]]]]]))
+
+
+
 (defn settings-container
   [child]
   [:div (stylefy/use-style settings-page-styles) child])
@@ -265,13 +292,5 @@
       [monitoring-comp s]
       [autosave-comp s]
       [backups-comp s]
-      [:div {:style {:margin "20px 0"}}
-       [:h5 "Your Name"]
-       [:div {:style {:display "flex" :justify-content "space-between"
-                      :margin "10px 0"}}
-        [:input {:style {:width "12em"}
-                 :value (:name @(subscribe [:user/current]))
-                 :on-change #(do (dispatch [:user/set :name (.. % -target -value)])
-                                 (js/localStorage.setItem "user/name" (.. % -target -value)))}]
-        "This name will be be displayed to other people in you org while using athens"]]]]))
+      [remote-comp s]]]))
 

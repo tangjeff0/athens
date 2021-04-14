@@ -9,6 +9,7 @@
     [cljs-http.client :as http]
     [cljs.core.async :refer [<!]]
     [goog.functions :as goog-functions]
+    [re-frame.core :refer [subscribe dispatch]]
     [reagent.core :as r]
     [stylefy.core :as stylefy])
   (:require-macros
@@ -263,4 +264,14 @@
       [email-comp s]
       [monitoring-comp s]
       [autosave-comp s]
-      [backups-comp s]]]))
+      [backups-comp s]
+      [:div {:style {:margin "20px 0"}}
+       [:h5 "Your Name"]
+       [:div {:style {:display "flex" :justify-content "space-between"
+                      :margin "10px 0"}}
+        [:input {:style {:width "12em"}
+                 :value (:name @(subscribe [:user/current]))
+                 :on-change #(do (dispatch [:user/set :name (.. % -target -value)])
+                                 (js/localStorage.setItem "user/name" (.. % -target -value)))}]
+        "This name will be be displayed to other people in you org while using athens"]]]]))
+

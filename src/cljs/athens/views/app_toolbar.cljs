@@ -20,6 +20,7 @@
     [athens.util :as util]
     [athens.views.buttons :refer [button]]
     [athens.views.filesystem :as filesystem]
+    [athens.views.presence :as presence]
     [re-frame.core :refer [subscribe dispatch]]
     [reagent.core :as r]
     [stylefy.core :as stylefy :refer [use-style]]))
@@ -132,6 +133,7 @@
         [:div (use-style app-header-secondary-controls-style)
          (if electron?
            [:<>
+            [presence/presence-popover-info]
             [(reagent.core/adapt-react-class FiberManualRecord)
              {:style {:color      (color (if @(subscribe [:db/synced])
                                            :confirmation-color

@@ -2,10 +2,12 @@
   (:require
     ["@material-ui/icons/ArrowBack" :default ArrowBack]
     ["@material-ui/icons/Close" :default Close]
-    ["@material-ui/icons/FolderOpen" :default FolderOpen]
+    ["@material-ui/icons/LibraryBooks" :default LibraryBooks]
     ["@material-ui/icons/MergeType" :default MergeType]
     ["@material-ui/icons/ToggleOff" :default ToggleOff]
     ["@material-ui/icons/ToggleOn" :default ToggleOn]
+    ["@material-ui/core/Tabs" :default Tabs]
+    ["@material-ui/core/Tab" :default Tab]
     [athens.electron :as electron]
     [athens.events :as events]
     [athens.subs]
@@ -28,14 +30,15 @@
    :padding         "0 1rem 1.5rem 1rem"
    :flex-direction  "column"
    :align-items     "center"
-   :width           "400px"
+   :width           "500px"
    ::stylefy/manual [[:p {:max-width  "24rem"
                           :text-align "center"}]
                      [:button.toggle-button {:font-size     "18px"
                                              :align-self    "flex-start"
                                              :padding-left  "0"
                                              :margin-bottom "1rem"}]
-                     [:code {:word-break "break-all"}]]})
+                     [:code {:word-break "break-all"}]
+                     [:.PrivateTabIndicator-colorSecondary-43 {:background-color "var(--link-color)"}]]})
 
 
 (rf/reg-event-db
@@ -147,30 +150,30 @@
         db-filepath       (subscribe [:db/filepath])
         state             (r/atom {:create  false
                                    :input   ""
-                                   :remote? (:default? @remote-graph-conf)})]
+                                   :remote? (:default? @remote-graph-conf)
+                                   :tab-value 0})]
     (fn []
       [:div (use-style modal-style)
        [modal/modal
         {:title    [:div.modal__title
-                    [:> FolderOpen]
-                    [:h4 "Filesystem"]
+                    [:> LibraryBooks]
+                    [:h4 "Database"]
                     (when-not @loading
                       [button {:on-click close-modal} [:> Close]])]
          :content  [:div (use-style modal-contents-style)
-                    [button {:primary  false
-                             :class    "toggle-button"
-                             :disabled false
-                             :on-click #(swap! state update :remote? not)}
-                     (if (:remote? @state)
-                       [:div {:style {:display "flex"}}
-                        [:> ToggleOn]
-                         ;;{:color "primary"}]
-                        [:span "Remote"]]
-                       [:div {:style {:display "flex"}}
-                        [:> ToggleOff]
-                        [:span "Local"]])]
+                    #_[button {:primary  false
+                               :class    "toggle-button"
+                               :disabled false
+                               :on-click #(swap! state update :remote? not)}]
+                    [:> Tabs {:on-change (fn [x y] (swap! state assoc :tab-value y))
+                              :value (:tab-value @state)}
+                     [:> Tab {:label "Open"}]
+                     [:> Tab {:label "Create New"}]
+                     [:> Tab {:label "Join Remote"}]]
+
                     (cond
-                      (:remote? @state)
+                      #_(:remote? @state)
+                      (= 2 (:tab-value @state))
                       [:<>
                        (->> [{:label       "Remote address"
                               :key         :address
@@ -188,7 +191,7 @@
                                                    :display         "flex"
                                                    :justify-content "space-between"}}
                                      [textinput/textinput {:style       {:flex-grow 1
-                                                                         :padding "5px"}
+                                                                         :padding   "5px"}
                                                            :type        (or input-type "text")
                                                            :value       (key @remote-graph-conf)
                                                            :placeholder placeholder
@@ -200,34 +203,38 @@
                                                                       :reload-on-init? true))}
                         "Connect"]]
 
-                      (and (not (:remote? @state))
-                           (:create @state))
+                      #_(and (not (:remote? @state))
+                             (:create @state))
+                      (= 1 (:tab-value @state))
+
                       [:<>
-                       [button {:style    {:align-self "start" :padding "0"}
-                                :on-click #(swap! state update :create not)}
-                        [:<>
-                         [:> ArrowBack]
-                         [:span "Back"]]]
+                       #_[button {:style    {:align-self "start" :padding "0"}
+                                  :on-click #(swap! state update :create not)}
+                          [:<>
+                           [:> ArrowBack]
+                           [:span "Back"]]]
                        [:div {:style {:display         "flex"
                                       :justify-content "space-between"
                                       :width           "100%"
                                       :margin-top      "2em"
                                       :margin-bottom   "1em"}}
-                        [:label "Database Name"]
-                        [:input {:value       (:input @state)
-                                 :placeholder "DB Name"
-                                 :on-change   #(swap! state assoc :input (.. % -target -value))}]]
+                        [:h5 "Database Name"]
+                        [textinput/textinput {:value       (:input @state)
+                                              :placeholder "DB Name"
+                                              :on-change   #(swap! state assoc :input (.. % -target -value))}]]
                        [:div {:style {:display         "flex"
                                       :justify-content "space-between"
                                       :width           "100%"}}
-                        [:label "Location"]
+                        [:h5 "New Location"]
                         [button {:primary  true
                                  :on-click #(electron/create-dialog! (:input @state))}
                          "Browse"]]]
 
-                      :else
+                      ;;:else
+                      (= 0 (:tab-value @state))
                       [:<>
-                       [:b {:style {:align-self "flex-start"}}
+                       [:h5 {:style {:align-self "flex-start"
+                                     :margin-top "2em"}}
                         (if @loading
                           "No DB Found At"
                           "Current Location")]
@@ -243,7 +250,7 @@
                                  :primary  true
                                  :on-click #(electron/move-dialog!)}
                          "Move"]
-                        [button {:primary  true
-                                 :on-click #(swap! state update :create not)}
-                         "Create"]]])]
+                        #_[button {:primary  true
+                                   :on-click #(swap! state update :create not)}
+                           "Create"]]])]
          :on-close close-modal}]])))

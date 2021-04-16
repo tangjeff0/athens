@@ -1,6 +1,7 @@
 (ns athens.effects
   (:require
     [athens.datsync-utils :as dat-s]
+    [athens.config :as config]
     [athens.db :as db]
     [athens.util :as util]
     [athens.walk :as walk]
@@ -221,17 +222,19 @@
       (dispatch [:show-snack-msg
                  {:msg "Graph is now read only"}])
       (do (prn "TX RAW INPUTS")                                   ;; event tx-data
-          (pprint tx-data)
+          (when config/debug? (pprint tx-data))
           (try
             (let [with-tx (d/with @db/dsdb tx-data)]
               (prn "TX WITH")                                       ;; tx-data normalized by datascript to flat datoms
-              (pprint (:tx-data with-tx))
+              (when config/debug? (pprint (:tx-data with-tx)))
               (let [more-tx-data  (parse-for-links with-tx)
                     final-tx-data (vec (concat tx-data more-tx-data))]
                 (prn "TX MORE")                                     ;; parsed tx-data, e.g. asserting/retracting pages and references
-                (pprint more-tx-data)
+                (when config/debug?
+                  (pprint more-tx-data))
                 (prn "TX FINAL INPUTS")                             ;; parsing block/string (and node/title) to derive asserted or retracted titles and block refs
-                (pprint final-tx-data)
+                (when config/debug?
+                  (pprint final-tx-data))
                 (let [{:keys [db-before tx-data]} (transact! db/dsdb final-tx-data)]
                   ;; check remote data against previous db
                   ((:send-fn ws/channel-socket)
@@ -241,11 +244,12 @@
                                                                tx-data))])
                   (ph-link-created! tx-data)
                   (prn "TX OUTPUTS")
-                  (pprint tx-data))))
+                  (when config/debug?
+                    (pprint tx-data)))))
 
             (catch js/Error e
               (js/alert (str e))
-              (prn "EXCEPTION" e)))))))
+              (js/console.log "EXCEPTION" e)))))))
 
 
 (reg-fx

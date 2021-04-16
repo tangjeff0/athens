@@ -39,7 +39,12 @@
   ([ctx-uid] [presence-popover-info ctx-uid {}])
   ([ctx-uid {:keys [inline?]}]
    (when (:default? @(subscribe [:db/remote-graph-conf]))
-     (let [curr-presence           @(subscribe [:presence/current])
+     (let [name (:name @(subscribe [:user/current]))
+           curr-presence           @(subscribe [:presence/current])
+           ;;others-connected-count  (->> curr-presence vals
+           ;;                             (filter #())
+           ;;                             count dec)
+           others-connected        (->> curr-presence vals count dec)
            others-in-cur-uid       (->> curr-presence vals
                                         (filter #(and ctx-uid
                                                       (or (= (:current/uid %) ctx-uid)
@@ -52,24 +57,30 @@
                                                       (or (= (:current/uid %) ctx-uid)
                                                           (= (:editing/uid %) ctx-uid))))
                                         count)]
+
        (r/with-let [ele (r/atom nil)]
          (when (or (not inline?)
                    (and inline? (>= others-in-cur-uid-count 1)))
            [:<>
             [button
-             {:onClick #(reset! ele (.-currentTarget %))
-              :style   (when inline?
-                         {:position "absolute"
-                          :left "-1.5rem"
-                          :padding-top "0.5rem"
-                          ::stylefy/manual [[:>svg {:font-size "1rem"}]]})}
+             {:on-mouse-enter #(reset! ele (.-currentTarget %))
+              :on-mouse-leave (fn [] (js/setTimeout #(reset! ele nil) 1500))
+              :style          (when inline?
+                                {:position        "absolute"
+                                 :left            "-1.5rem"
+                                 :padding-top     "0.5rem"
+                                 ::stylefy/manual [[:>svg {:font-size "1rem"}]]})}
+             ;; inline is at the block-level
+             ;; not inline is for the app-toolbar
              (if inline?
                [:> Group]
                [:<>
                 [:> Visibility]
                 [:span
                  (cond-> (str "You")
-                   (> others-in-cur-uid-count 0) (str " and " others-in-cur-uid-count " others"))]])]
+                   (> others-connected 0) (str " and " others-connected " others"))]])]
+
+            ;; Popover to the left of a block. For when user wants to hover and see who is on a block
             [m-popover
              {:open            (boolean (and (> others-in-cur-uid-count 0) @ele))
               :anchorEl        @ele

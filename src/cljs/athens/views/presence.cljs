@@ -71,7 +71,7 @@
                  (cond-> (str "You")
                    (> others-in-cur-uid-count 0) (str " and " others-in-cur-uid-count " others"))]])]
             [m-popover
-             {:open            (and (> others-in-cur-uid-count 0) @ele)
+             {:open            (boolean (and (> others-in-cur-uid-count 0) @ele))
               :anchorEl        @ele
               :onClose         #(reset! ele nil)
               :anchorOrigin    #js{:vertical   "bottom"

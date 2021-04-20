@@ -16,6 +16,8 @@
     [athens.views.textinput :as textinput]
     [athens.ws-client :as ws-client]
     [cljs.reader :refer [read-string]]
+    [cljsjs.react]
+    [cljsjs.react.dom]
     [clojure.edn :as edn]
     [datascript.core :as d]
     [komponentit.modal :as modal]
@@ -255,6 +257,7 @@
         close-modal       (fn []
                             (when-not @loading
                               (dispatch [:modal/toggle])))
+        el (.. js/document (querySelector "#app"))
         remote-graph-conf (subscribe [:db/remote-graph-conf])
         db-filepath       (subscribe [:db/filepath])
         state             (r/atom {:input     ""

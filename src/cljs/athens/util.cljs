@@ -2,10 +2,13 @@
   (:require
     ["/textarea" :as getCaretCoordinates]
     [athens.config :as config]
+    [cljsjs.react]
+    [cljsjs.react.dom]
     [clojure.string :as string]
     [com.rpl.specter :as s]
     [goog.dom :refer [getElement setProperties]]
     [posh.reagent :refer [#_pull]]
+    [reagent.core :as r]
     [tick.alpha.api :as t]
     [tick.locale-en-us])
   (:require-macros
@@ -152,6 +155,12 @@
 (defn js-event->val
   [event]
   (.. event -target -value))
+
+
+(defn react-portal
+  [component]
+  (let [el (.. js/document (querySelector "#app"))]
+    (js/ReactDOM.createPortal (r/as-element component) el)))
 
 
 ;; -- Date and Time ------------------------------------------------------

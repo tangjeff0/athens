@@ -3,6 +3,7 @@
   (:require
     ["katex" :as katex]
     ["katex/dist/contrib/mhchem"]
+    [athens.views.pages.node-page :as node-page]
     #_["codemirror/addon/edit/closebrackets"]
     #_["codemirror/addon/edit/matchbrackets"]
     #_["codemirror/mode/clike/clike"]
@@ -120,9 +121,12 @@
   (let [node (pull-node-from-string title)]
     [:span (use-style page-link {:class "page-link"})
      [:span {:class "formatting"} "[["]
-     (into [:span {:on-click (fn [e]
-                               (.. e stopPropagation) ;; prevent bubbling up click handler for nested links
-                               (navigate-uid (:block/uid @node) e))}]
+     (into [:span {:on-click      (fn [e]
+                                    (.. e stopPropagation) ;; prevent bubbling up click handler for nested links
+                                    (navigate-uid (:block/uid @node) e))
+                   :on-mouse-over (fn [e]
+                                    (render-preview [:node/title title])
+                                    #_[node-page/page ])}]
            title)
      [:span {:class "formatting"} "]]"]]))
 

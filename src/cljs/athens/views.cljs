@@ -63,7 +63,10 @@
 (defn main
   []
   (let [loading    (rf/subscribe [:loading?])
-        modal      (rf/subscribe [:modal])]
+        modal      (rf/subscribe [:modal])
+        preview?   (rf/subscribe [:preview])
+        preview-coord (rf/subscribe [:preview/coordinates])
+        preview-uid (rf/subscribe [:preview/uid])]
     (fn []
       [:<>
        [alert]
@@ -91,4 +94,9 @@
                  [left-sidebar/left-sidebar]
                  [pages/view]
                  [right-sidebar/right-sidebar]
-                 [devtool-component]]])])))
+                 [devtool-component]
+
+                 ;; show dropdown for preview
+                 (when @preview?
+                   [:div {:style {:position "absolute"}}
+                    [athens.views.pages.node-page/page [:block/uid @preview-uid]]])]])])))

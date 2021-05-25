@@ -1,0 +1,9 @@
+{
+"version":3,
+"file":"goog.html.trustedtypes.js",
+"lineCount":3,
+"mappings":"AAmBAA,IAAA,CAAKC,OAAL,CAAa,wBAAb,CAAA;AAGAD,IAAA,CAAKE,IAAL,CAAUC,YAAV,CAAuBC,oCAAvB,GACIJ,IAAA,CAAKK,yBAAL,GACAL,IAAA,CAAKM,wBAAL,CAA8BN,IAA9B,CAAmCK,yBAAnC,GAA+D,OAA/D,CADA,GAEA,IAHJ;;",
+"sources":["goog/html/trustedtypes.js"],
+"sourcesContent":["// Copyright 2018 The Closure Library Authors. All Rights Reserved.\n//\n// Licensed under the Apache License, Version 2.0 (the \"License\");\n// you may not use this file except in compliance with the License.\n// You may obtain a copy of the License at\n//\n//      http://www.apache.org/licenses/LICENSE-2.0\n//\n// Unless required by applicable law or agreed to in writing, software\n// distributed under the License is distributed on an \"AS-IS\" BASIS,\n// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n// See the License for the specific language governing permissions and\n// limitations under the License.\n\n/**\n * @fileoverview Policy to convert strings to Trusted Types. See\n * https://github.com/WICG/trusted-types for details.\n */\n\ngoog.provide('goog.html.trustedtypes');\n\n/** @package @const {?TrustedTypePolicy} */\ngoog.html.trustedtypes.PRIVATE_DO_NOT_ACCESS_OR_ELSE_POLICY =\n    goog.TRUSTED_TYPES_POLICY_NAME ?\n    goog.createTrustedTypesPolicy(goog.TRUSTED_TYPES_POLICY_NAME + '#html') :\n    null;\n"],
+"names":["goog","provide","html","trustedtypes","PRIVATE_DO_NOT_ACCESS_OR_ELSE_POLICY","TRUSTED_TYPES_POLICY_NAME","createTrustedTypesPolicy"]
+}

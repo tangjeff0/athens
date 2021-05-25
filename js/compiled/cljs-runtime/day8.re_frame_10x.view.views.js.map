@@ -1,0 +1,1 @@
+{"version":3,"sources":["day8/re_frame_10x/view/views.cljs"],"mappings":";AAEA,AAAA,AAAMA;AAAN,AAAA","names":["day8.re-frame-10x.view.views/render"],"sourcesContent":["(ns day8.re-frame-10x.view.views)\n\n(defn render [])\n"]}

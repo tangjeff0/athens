@@ -1,0 +1,1 @@
+{"version":3,"sources":["cljs/java_time/extend_eq_and_compare.cljs"],"mappings":"","names":[],"sourcesContent":["(ns cljs.java-time.extend-eq-and-compare)\r\n\r\n;;\r\n;; Empty file, kept for backward compatibility reasons.\r\n;; All equality and hash protocol implementations moved to java/time.cljs\r\n;;\r\n"]}

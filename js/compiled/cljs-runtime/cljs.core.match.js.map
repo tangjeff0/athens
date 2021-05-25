@@ -1,0 +1,1 @@
+{"version":3,"sources":["cljs/core/match.cljs"],"mappings":";AAGA,AAAKA,AAAU,AAAAC","names":["cljs.core.match/backtrack","js/Error"],"sourcesContent":["(ns cljs.core.match\n  (:require-macros cljs.core.match))\n\n(def backtrack (js/Error.))\n"]}

@@ -1,0 +1,1 @@
+{"version":3,"sources":["cljsjs/react.cljs"],"mappings":";;AAGA,AAAA,AAACA,AAA6BC","names":["js/goog.exportSymbol","js/module$node_modules$react$index"],"sourcesContent":["(ns cljsjs.react\n  (:require [\"react\" :as react]))\n\n(js/goog.exportSymbol \"React\" react)"]}

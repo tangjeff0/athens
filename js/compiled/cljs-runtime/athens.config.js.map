@@ -1,0 +1,1 @@
+{"version":3,"sources":["athens/config.cljs"],"mappings":";AAGA,AAAKA,AACMC","names":["athens.config/debug?","js/goog.DEBUG"],"sourcesContent":["(ns athens.config)\n\n\n(def debug?\n  ^boolean goog.DEBUG)\n"]}

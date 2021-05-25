@@ -1,0 +1,9 @@
+{
+"version":3,
+"file":"com.cognitect.transit.delimiters.js",
+"lineCount":10,
+"mappings":"AAcAA,IAAA,CAAKC,OAAL,CAAa,kCAAb,CAAA;AAEAD,IAAA,CAAKE,KAAL,CAAW,QAAQ,EAAG;AAEtB,MAAIC,aAAaC,GAAbD,CAAiBE,SAAjBF,CAA2BG,OAA3BH,CAAmCA,UAAvC;AAMAA,YAAA,CAAWI,GAAX,GAAqB,GAArB;AAMAJ,YAAA,CAAWK,GAAX,GAAqB,GAArB;AAMAL,YAAA,CAAWM,GAAX,GAAqB,GAArB;AAMAN,YAAA,CAAWO,GAAX,GAAqB,GAArB;AAMAP,YAAA,CAAWQ,OAAX,GAAqB,IAArB;AAhCsB,CAAtB,CAAA;;",
+"sources":["com/cognitect/transit/delimiters.js"],
+"sourcesContent":["// Copyright 2014 Cognitect. All Rights Reserved.\n//\n// Licensed under the Apache License, Version 2.0 (the \"License\");\n// you may not use this file except in compliance with the License.\n// You may obtain a copy of the License at\n//\n//      http://www.apache.org/licenses/LICENSE-2.0\n//\n// Unless required by applicable law or agreed to in writing, software\n// distributed under the License is distributed on an \"AS-IS\" BASIS,\n// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n// See the License for the specific language governing permissions and\n// limitations under the License.\n\ngoog.provide(\"com.cognitect.transit.delimiters\");\n\ngoog.scope(function() {\n\nvar delimiters = com.cognitect.transit.delimiters;\n    \n/**\n * @const\n * @type {string}\n */\ndelimiters.ESC     = \"~\";\n\n/**\n * @const\n * @type {string}\n */\ndelimiters.TAG     = \"#\";\n\n/**\n * @const\n * @type {string}\n */\ndelimiters.SUB     = \"^\";\n\n/**\n * @const\n * @type {string}\n */\ndelimiters.RES     = \"`\";\n\n/**\n * @const\n * @type {string}\n */\ndelimiters.ESC_TAG = \"~#\";\n\n});\n"],
+"names":["goog","provide","scope","delimiters","com","cognitect","transit","ESC","TAG","SUB","RES","ESC_TAG"]
+}

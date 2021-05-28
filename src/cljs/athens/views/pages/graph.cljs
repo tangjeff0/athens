@@ -298,7 +298,7 @@
                                        :max 0}
                             :comp     m-slider
                             :class    "slider"
-                            :onChange (fn [val] (and graph-ref (.. graph-ref (d3Force "charge") (strength val))))}]
+                            :onChange (fn [val] (and graph-ref (.. ^js graph-ref (d3Force "charge") (strength val))))}]
            force-section  {:heading  "Forces"
                            :controls force-controls}
 
@@ -353,14 +353,14 @@
                                                 .-parentNode .-clientHeight))
             ;; set init forces for graph
             (when graph-ref
-              (.. (.. graph-ref (d3Force "charge"))
+              (.. (.. ^js graph-ref (d3Force "charge"))
                   (distanceMax (/ (min (:width @dimensions)
                                        (:height @dimensions))
                                   2)))
               (let [c-force (.. graph-ref (d3Force "center"))]
                 (c-force (/ (:width @dimensions) 2) (/ (:height @dimensions) 2)))
 
-              (.. (.. graph-ref (d3Force "charge")) (strength (:charge-strength graph-conf)))
+              (.. (.. ^js graph-ref (d3Force "charge")) (strength (:charge-strength graph-conf)))
               (.. (.. graph-ref (d3Force "link")) (distance (:link-distance graph-conf)))
               (.d3ReheatSimulation graph-ref))))
 
